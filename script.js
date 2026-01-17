@@ -1080,6 +1080,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Global Contact Modal Functions (available immediately)
+function openContactModal() {
+    const contactModal = document.getElementById('contactModal');
+    if (!contactModal) return;
+    
+    contactModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(() => {
+        contactModal.classList.add('show');
+    }, 10);
+}
+
+function closeContactModal() {
+    const contactModal = document.getElementById('contactModal');
+    if (!contactModal) return;
+    
+    contactModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    
+    setTimeout(() => {
+        contactModal.style.display = 'none';
+    }, 300);
+}
+
 // Contact Modal Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const contactModal = document.getElementById('contactModal');
@@ -1091,25 +1116,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitText = submitBtn.querySelector('.submit-text');
     const submitLoading = submitBtn.querySelector('.submit-loading');
     const submitSuccess = submitBtn.querySelector('.submit-success');
-    
-    // General modal functions
-    window.openContactModal = function() {
-        contactModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        setTimeout(() => {
-            contactModal.classList.add('show');
-        }, 10);
-    };
-    
-    window.closeContactModal = function() {
-        contactModal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-        
-        setTimeout(() => {
-            contactModal.style.display = 'none';
-        }, 300);
-    };
     
     // Close modal when clicking outside
     contactModal.addEventListener('click', (e) => {
