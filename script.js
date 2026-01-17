@@ -1076,10 +1076,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // EmailJS submission - replace with your EmailJS credentials
             const response = await emailjs.send(
-                'YOUR_SERVICE_ID',     // Replace with your EmailJS Service ID
-                'YOUR_TEMPLATE_ID',    // Replace with your EmailJS Template ID  
+                'service_03owqxk',     // Your EmailJS Service ID
+                'template_m1kk0n5',    // Service inquiry template
                 formObject,            // Form data
-                'YOUR_PUBLIC_KEY'      // Replace with your EmailJS Public Key
+                'u5U7kzPn5p1OUsf8s'    // Your EmailJS Public Key
             );
             
             // EmailJS success handling
@@ -1291,10 +1291,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // EmailJS submission - replace with your EmailJS credentials
             const response = await emailjs.send(
-                'YOUR_SERVICE_ID',     // Replace with your EmailJS Service ID
-                'YOUR_TEMPLATE_ID',    // Replace with your EmailJS Template ID
+                'service_03owqxk',     // Your EmailJS Service ID
+                'template_8gxax7w',    // Main contact form template
                 formObject,            // Form data
-                'YOUR_PUBLIC_KEY'      // Replace with your EmailJS Public Key
+                'u5U7kzPn5p1OUsf8s'    // Your EmailJS Public Key
             );
             
             // EmailJS returns a different response format
