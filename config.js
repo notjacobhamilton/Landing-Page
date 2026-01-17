@@ -1,4 +1,4 @@
-// Email Configuration
+// Email Configuration - Version 2.0 (Fixed)
 // This will load from Netlify Functions in production
 // Temporary fallback for immediate functionality
 
@@ -11,7 +11,7 @@ let emailConfig = {
 
 // Make config immediately available
 window.emailConfig = emailConfig;
-console.log('✅ Initial emailConfig set:', window.emailConfig);
+console.log('✅ Initial emailConfig set (v2.0):', window.emailConfig);
 
 // Try to load secure configuration from Netlify Functions (override fallback)
 async function loadConfig() {

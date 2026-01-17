@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded - emailConfig available:', !!window.emailConfig);
     if (window.emailConfig) {
         console.log('emailConfig serviceId:', window.emailConfig.serviceId ? 'present' : 'missing');
+        console.log('Full emailConfig object:', window.emailConfig);
+    } else {
+        console.error('❌ emailConfig is not available!');
     }
     
     const themeToggle = document.getElementById('theme-toggle');
