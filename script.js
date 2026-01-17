@@ -1079,3 +1079,315 @@ document.addEventListener('DOMContentLoaded', function() {
         // });
     });
 });
+
+// Contact Modal Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const contactModal = document.getElementById('contactModal');
+    const contactForm = document.getElementById('mainContactForm');
+    
+    if (!contactForm) return; // Exit if contact form doesn't exist
+    
+    const submitBtn = contactForm.querySelector('.contact-submit');
+    const submitText = submitBtn.querySelector('.submit-text');
+    const submitLoading = submitBtn.querySelector('.submit-loading');
+    const submitSuccess = submitBtn.querySelector('.submit-success');
+    
+    // General modal functions
+    window.openContactModal = function() {
+        contactModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        setTimeout(() => {
+            contactModal.classList.add('show');
+        }, 10);
+    };
+    
+    window.closeContactModal = function() {
+        contactModal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        setTimeout(() => {
+            contactModal.style.display = 'none';
+        }, 300);
+    };
+    
+    // Close modal when clicking outside
+    contactModal.addEventListener('click', (e) => {
+        if (e.target === contactModal) {
+            closeContactModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+            closeContactModal();
+        }
+    });
+    
+    // Auto-resize textarea
+    const messageTextarea = document.getElementById('contactMessage');
+    if (messageTextarea) {
+        messageTextarea.addEventListener('input', autoResizeTextarea);
+    }
+    
+    function autoResizeTextarea(e) {
+        const textarea = e.target;
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+    
+    // Form validation
+    const requiredFields = ['contactName', 'contactEmail', 'contactMessage'];
+    
+    // Real-time validation
+    contactForm.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('blur', validateField);
+        field.addEventListener('input', clearValidation);
+    });
+    
+    function validateField(e) {
+        const field = e.target;
+        const value = field.value.trim();
+        
+        // Remove existing validation classes
+        field.classList.remove('valid', 'invalid');
+        
+        // Check if required field is empty
+        if (requiredFields.includes(field.id) && !value) {
+            field.classList.add('invalid');
+            return false;
+        }
+        
+        // Email validation
+        if (field.type === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                field.classList.add('invalid');
+                return false;
+            }
+        }
+        
+        // Phone validation (optional but if provided should be valid)
+        if (field.id === 'contactPhone' && value) {
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''))) {
+                field.classList.add('invalid');
+                return false;
+            }
+        }
+        
+        // Mark as valid if all checks pass
+        if (value) {
+            field.classList.add('valid');
+        }
+        
+        return true;
+    }
+    
+    function clearValidation(e) {
+        const field = e.target;
+        field.classList.remove('valid', 'invalid');
+    }
+    
+    // Form submission
+    contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validate all fields
+        let isValid = true;
+        contactForm.querySelectorAll('input, select, textarea').forEach(field => {
+            if (!validateField({ target: field })) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            // Focus on first invalid field
+            const firstInvalid = contactForm.querySelector('.invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+            }
+            return;
+        }
+        
+        // Set loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        
+        // Collect form data
+        const formData = new FormData(contactForm);
+        
+        // Add timestamp and page info
+        formData.append('_timestamp', new Date().toISOString());
+        formData.append('_page', window.location.href);
+        formData.append('_userAgent', navigator.userAgent);
+        
+        try {
+            // TODO: Replace 'YOUR_FORMSPREE_ID' with actual Formspree form ID
+            // Example: https://formspree.io/f/xpznknko
+            const response = await fetch('https://formspree.io/f/YOUR_FORMSPREE_ID', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                // Success state
+                submitBtn.classList.remove('loading');
+                submitBtn.classList.add('success');
+                
+                // Reset form after delay
+                setTimeout(() => {
+                    contactForm.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('success');
+                    contactForm.querySelectorAll('.valid, .invalid').forEach(field => {
+                        field.classList.remove('valid', 'invalid');
+                    });
+                    
+                    // Close modal
+                    closeContactModal();
+                    
+                    // Show success notification
+                    showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
+                }, 2000);
+            } else {
+                throw new Error('Form submission failed');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            
+            // Show error notification
+            showNotification('Failed to send message. Please try the direct contact methods above.', 'error');
+        }
+    });
+    
+    // Notification system
+    function showNotification(message, type = 'info') {
+        // Remove existing notifications
+        document.querySelectorAll('.notification').forEach(n => n.remove());
+        
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">
+                    ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+                </span>
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        
+        // Add notification styles if not already added
+        if (!document.querySelector('#notification-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'notification-styles';
+            styles.textContent = `
+                .notification {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    min-width: 320px;
+                    max-width: 500px;
+                    background: var(--bg-primary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 0.75rem;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                    animation: slideIn 0.3s ease;
+                }
+                
+                .notification-success {
+                    border-left: 4px solid #10b981;
+                }
+                
+                .notification-error {
+                    border-left: 4px solid #ef4444;
+                }
+                
+                .notification-info {
+                    border-left: 4px solid #6366f1;
+                }
+                
+                .notification-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 1rem 1.25rem;
+                }
+                
+                .notification-icon {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                }
+                
+                .notification-success .notification-icon {
+                    color: #10b981;
+                }
+                
+                .notification-error .notification-icon {
+                    color: #ef4444;
+                }
+                
+                .notification-info .notification-icon {
+                    color: #6366f1;
+                }
+                
+                .notification-message {
+                    flex: 1;
+                    color: var(--text-primary);
+                    font-size: 0.9rem;
+                    line-height: 1.4;
+                }
+                
+                .notification-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.25rem;
+                    color: var(--text-muted);
+                    cursor: pointer;
+                    padding: 0;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    transition: all 0.2s ease;
+                }
+                
+                .notification-close:hover {
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
+                }
+                
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+});

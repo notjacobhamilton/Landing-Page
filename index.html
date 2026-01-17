@@ -391,7 +391,7 @@ class FormValidator {
                 <div class="contact-content">
                     <h2>Ready to start a conversation?</h2>
                     <p>Let's discuss your project and see how I can help your business succeed online. No pressure, no commitment—just an honest conversation about your needs.</p>
-                    <a href="mailto:hello@jacobhamilton.dev" class="btn btn-primary">Get in Touch</a>
+                    <button id="open-contact-modal" class="btn btn-primary">Get in Touch</button>
                 </div>
             </div>
         </section>
@@ -481,6 +481,141 @@ class FormValidator {
                         I'll get back to you within 24 hours with a detailed response and next steps.
                     </p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="modal contact-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content contact-modal-content">
+            <div class="modal-header">
+                <h2>Let's work together</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body contact-modal-body">
+                <div class="contact-intro">
+                    <div class="contact-avatar">
+                        <div class="avatar-placeholder">JH</div>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Hi, I'm Jacob</h3>
+                        <p>I'd love to learn about your project and see how I can help bring your vision to life. Fill out the form below and I'll get back to you within 24 hours.</p>
+                        <div class="contact-methods">
+                            <a href="mailto:notjacob.hamilton@gmail.com" class="contact-method">
+                                <span class="method-icon">📧</span>
+                                <span>notjacob.hamilton@gmail.com</span>
+                            </a>
+                            <div class="contact-method">
+                                <span class="method-icon">⏱️</span>
+                                <span>Usually responds in 2-4 hours</span>
+                            </div>
+                            <div class="contact-method">
+                                <span class="method-icon">📍</span>
+                                <span>Available for remote work</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="main-contact-form" class="main-contact-form" action="#" method="POST">
+                    <!-- Formspree will replace the action URL -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-name">Full Name *</label>
+                            <input type="text" id="contact-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email Address *</label>
+                            <input type="email" id="contact-email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-company">Company/Business</label>
+                            <input type="text" id="contact-company" name="company">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-phone">Phone Number</label>
+                            <input type="tel" id="contact-phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-project-type">Project Type *</label>
+                        <select id="contact-project-type" name="project_type" required>
+                            <option value="">Select your project type</option>
+                            <option value="new-website">New Website Development</option>
+                            <option value="redesign">Website Redesign</option>
+                            <option value="landing-page">Landing Page</option>
+                            <option value="web-app">Web Application</option>
+                            <option value="billing-system">Billing/Invoicing System</option>
+                            <option value="dashboard">Dashboard/Admin Panel</option>
+                            <option value="consulting">Technical Consulting</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-budget">Budget Range</label>
+                            <select id="contact-budget" name="budget">
+                                <option value="">Select your budget</option>
+                                <option value="under-5k">Under $5,000</option>
+                                <option value="5k-15k">$5,000 - $15,000</option>
+                                <option value="15k-30k">$15,000 - $30,000</option>
+                                <option value="30k-50k">$30,000 - $50,000</option>
+                                <option value="50k-plus">$50,000+</option>
+                                <option value="discuss">Let's discuss</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-timeline">Timeline</label>
+                            <select id="contact-timeline" name="timeline">
+                                <option value="">When do you need this?</option>
+                                <option value="urgent">ASAP (Rush fee applies)</option>
+                                <option value="1-month">Within 1 month</option>
+                                <option value="2-months">1-2 months</option>
+                                <option value="3-months">2-3 months</option>
+                                <option value="6-months">3-6 months</option>
+                                <option value="flexible">Flexible timing</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-message">Tell me about your project *</label>
+                        <textarea id="contact-message" name="message" rows="6" placeholder="Describe your project goals, target audience, key features, and any specific requirements..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-inspiration">Inspiration (Optional)</label>
+                        <input type="url" id="contact-inspiration" name="inspiration" placeholder="Any websites you like or want to reference?">
+                    </div>
+                    
+                    <!-- Hidden fields for tracking -->
+                    <input type="hidden" name="_subject" value="New Project Inquiry from Landing Page">
+                    <input type="hidden" name="_cc" value="notjacob.hamilton@gmail.com">
+                    <input type="hidden" name="source" value="landing-page-contact">
+                    <input type="hidden" name="timestamp" id="form-timestamp">
+                    
+                    <!-- Formspree configuration -->
+                    <input type="hidden" name="_next" value="https://notjacobhamilton.github.io/Landing-Page/thank-you.html">
+                    <input type="hidden" name="_autoresponse" value="Thanks for reaching out! I've received your message and will get back to you within 24 hours. - Jacob">
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary contact-submit">
+                            <span class="submit-text">Send Message</span>
+                            <span class="submit-loading" style="display: none;">Sending...</span>
+                            <span class="submit-success" style="display: none;">Sent!</span>
+                        </button>
+                        <p class="form-disclaimer">
+                            By submitting this form, you agree to receive project-related communication from me. 
+                            I respect your privacy and will never share your information.
+                        </p>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
