@@ -1,5 +1,11 @@
 // Dark Mode Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Debug: Check if emailConfig is available
+    console.log('DOMContentLoaded - emailConfig available:', !!window.emailConfig);
+    if (window.emailConfig) {
+        console.log('emailConfig serviceId:', window.emailConfig.serviceId ? 'present' : 'missing');
+    }
+    
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
     
@@ -1049,19 +1055,8 @@ document.addEventListener('DOMContentLoaded', function() {
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Wait for config to be ready if not already loaded
-        if (!window.emailConfig) {
-            await new Promise(resolve => {
-                if (window.emailConfig) {
-                    resolve();
-                } else {
-                    window.addEventListener('configReady', resolve, { once: true });
-                }
-            });
-        }
-        
-        // Check if config is still null after loading
-        if (!window.emailConfig) {
+        // Ensure config is available (should be loaded immediately now)
+        if (!window.emailConfig || !window.emailConfig.serviceId) {
             console.error('EmailJS configuration not available for service form');
             showNotification('Configuration error. Please contact me directly at jrhamilton0929@gmail.com', 'error');
             return;
@@ -1611,19 +1606,8 @@ document.addEventListener('DOMContentLoaded', function() {
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Wait for config to be ready if not already loaded
-        if (!window.emailConfig) {
-            await new Promise(resolve => {
-                if (window.emailConfig) {
-                    resolve();
-                } else {
-                    window.addEventListener('configReady', resolve, { once: true });
-                }
-            });
-        }
-        
-        // Check if config is still null after loading
-        if (!window.emailConfig) {
+        // Ensure config is available (should be loaded immediately now)
+        if (!window.emailConfig || !window.emailConfig.serviceId) {
             console.error('EmailJS configuration not available for contact form');
             showNotification('Configuration error. Please contact me directly at jrhamilton0929@gmail.com', 'error');
             return;
