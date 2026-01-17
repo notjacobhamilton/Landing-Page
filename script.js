@@ -1071,6 +1071,8 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject._timestamp = new Date().toISOString();
         formObject._page = window.location.href;
         formObject._userAgent = navigator.userAgent;
+        formObject._emailTo = 'jrhamilton0929@gmail.com';
+        formObject._subject = 'Website Inquiry - Service Request';
         formObject._formType = 'service_inquiry';
         
         try {
@@ -1291,6 +1293,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject._timestamp = new Date().toISOString();
         formObject._page = window.location.href;
         formObject._userAgent = navigator.userAgent;
+        formObject._emailTo = 'jrhamilton0929@gmail.com';
+        formObject._subject = 'Website Inquiry - Contact Form Submission';
+        formObject._formType = 'contact';
         
         try {
             // AJAX submission to your backend endpoint
