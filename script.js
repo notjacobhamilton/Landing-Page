@@ -34,6 +34,101 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Real-Time Business Metrics
+document.addEventListener('DOMContentLoaded', function() {
+    // Simulate real-time visitor counter
+    const visitorCount = document.querySelector('.visitor-count');
+    if (visitorCount) {
+        let count = 847; // Starting count
+        
+        // Increment visitors occasionally
+        setInterval(() => {
+            if (Math.random() < 0.3) { // 30% chance every interval
+                count += Math.floor(Math.random() * 3) + 1; // Add 1-3 visitors
+                visitorCount.textContent = count;
+                
+                // Add a subtle flash animation
+                visitorCount.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    visitorCount.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }, 8000); // Check every 8 seconds
+    }
+    
+    // Simulate response time variations
+    const responseTime = document.getElementById('response-time');
+    if (responseTime) {
+        const responseTimes = ['~1.2 hrs', '~2.4 hrs', '~1.8 hrs', '~3.1 hrs', '~2.0 hrs'];
+        let currentIndex = 1; // Start with ~2.4 hrs
+        
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % responseTimes.length;
+            responseTime.textContent = responseTimes[currentIndex];
+            
+            // Add update animation
+            responseTime.style.opacity = '0.5';
+            setTimeout(() => {
+                responseTime.style.opacity = '1';
+            }, 300);
+        }, 15000); // Update every 15 seconds
+    }
+    
+    // Project capacity simulation
+    const projectCapacity = document.getElementById('project-capacity');
+    const statusIndicator = document.querySelector('.status-indicator');
+    const statusText = document.querySelector('.status-text');
+    
+    if (projectCapacity && statusIndicator && statusText) {
+        const capacities = [
+            { text: '1/4', status: 'available', message: 'Available for new projects' },
+            { text: '2/4', status: 'available', message: 'Available for new projects' },
+            { text: '3/4', status: 'busy', message: 'Limited availability' },
+            { text: '4/4', status: 'unavailable', message: 'Currently at capacity' }
+        ];
+        let currentCapacity = 1; // Start with 2/4
+        
+        setInterval(() => {
+            // Occasionally change capacity (simulate project fluctuations)
+            if (Math.random() < 0.1) { // 10% chance
+                const change = Math.random() < 0.5 ? -1 : 1;
+                currentCapacity = Math.max(0, Math.min(3, currentCapacity + change));
+                
+                const capacity = capacities[currentCapacity];
+                projectCapacity.textContent = capacity.text;
+                
+                // Update status indicator
+                statusIndicator.className = `status-indicator ${capacity.status}`;
+                statusText.textContent = capacity.message;
+                
+                // Add update animation
+                projectCapacity.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    projectCapacity.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }, 12000); // Check every 12 seconds
+    }
+    
+    // Add real-time clock for professional feel
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            timeZone: 'America/New_York', // Adjust to your timezone
+            hour12: true,
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        const timeString = now.toLocaleTimeString('en-US', options);
+        
+        // You can add this to show current time if desired
+        // document.getElementById('current-time').textContent = timeString;
+    }
+    
+    updateClock();
+    setInterval(updateClock, 60000); // Update every minute
+});
+
 // Splash Screen and Page Load Animation Handler
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
