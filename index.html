@@ -80,6 +80,160 @@
             </div>
         </section>
 
+        <!-- Interactive Code Preview -->
+        <section class="code-preview" id="code-preview">
+            <div class="container">
+                <h2 class="section-title">See the code behind the magic</h2>
+                <div class="code-showcase">
+                    <div class="code-tabs">
+                        <button class="code-tab active" data-language="javascript">JavaScript</button>
+                        <button class="code-tab" data-language="react">React</button>
+                        <button class="code-tab" data-language="python">Python</button>
+                        <button class="code-tab" data-language="css">CSS</button>
+                    </div>
+                    
+                    <div class="code-container">
+                        <div class="code-header">
+                            <div class="code-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <div class="code-title" id="code-title">Dynamic Form Validation</div>
+                            <div class="code-actions">
+                                <button class="code-action" id="run-code" title="Run Code">▶️</button>
+                                <button class="code-action" id="copy-code" title="Copy Code">📋</button>
+                            </div>
+                        </div>
+                        
+                        <div class="code-content">
+                            <pre><code id="code-display" class="language-javascript">// Real-time form validation with smooth animations
+class FormValidator {
+  constructor(form) {
+    this.form = form;
+    this.rules = new Map();
+    this.init();
+  }
+
+  addRule(field, validator, message) {
+    this.rules.set(field, { validator, message });
+    return this;
+  }
+
+  async validate(field) {
+    const rule = this.rules.get(field);
+    const input = this.form.querySelector(`[name="${field}"]`);
+    
+    if (!rule || !input) return true;
+    
+    const isValid = await rule.validator(input.value);
+    this.showFeedback(input, isValid, rule.message);
+    
+    return isValid;
+  }
+
+  showFeedback(input, isValid, message) {
+    const feedback = input.nextElementSibling;
+    
+    input.classList.toggle('valid', isValid);
+    input.classList.toggle('invalid', !isValid);
+    
+    if (feedback) {
+      feedback.textContent = isValid ? '✓ Looks good!' : message;
+      feedback.className = isValid ? 'feedback success' : 'feedback error';
+    }
+  }
+}</code></pre>
+                        </div>
+                        
+                        <div class="code-output" id="code-output">
+                            <div class="output-header">Output</div>
+                            <div class="output-content" id="output-content">
+                                <div class="demo-form">
+                                    <input type="email" placeholder="Enter your email" class="demo-input">
+                                    <div class="feedback">Start typing to see validation...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tech-stack">
+                    <h3>Technologies I work with daily</h3>
+                    <div class="tech-icons">
+                        <div class="tech-item" data-tech="JavaScript">
+                            <span class="tech-icon">⚡</span>
+                            <span class="tech-name">JavaScript</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="tech-item" data-tech="React">
+                            <span class="tech-icon">⚛️</span>
+                            <span class="tech-name">React</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="tech-item" data-tech="Python">
+                            <span class="tech-icon">🐍</span>
+                            <span class="tech-name">Python</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="tech-item" data-tech="Node.js">
+                            <span class="tech-icon">🟢</span>
+                            <span class="tech-name">Node.js</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="tech-item" data-tech="SQL">
+                            <span class="tech-icon">🗄️</span>
+                            <span class="tech-name">SQL</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="tech-item" data-tech="AWS">
+                            <span class="tech-icon">☁️</span>
+                            <span class="tech-name">AWS</span>
+                            <div class="tech-level">
+                                <div class="level-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="github-activity">
+                    <h3>Recent GitHub Activity</h3>
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <span class="activity-icon">🚀</span>
+                            <span class="activity-text">Deployed new features to production</span>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-icon">🔧</span>
+                            <span class="activity-text">Fixed performance bottleneck in API</span>
+                            <span class="activity-time">6 hours ago</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-icon">✨</span>
+                            <span class="activity-text">Added dark mode to client project</span>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-icon">📝</span>
+                            <span class="activity-text">Updated documentation and README</span>
+                            <span class="activity-time">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Services Section -->
         <section class="services" id="services">
             <div class="container">

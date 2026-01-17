@@ -129,6 +129,439 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateClock, 60000); // Update every minute
 });
 
+// Interactive Code Preview
+document.addEventListener('DOMContentLoaded', function() {
+    const codeSamples = {
+        javascript: {
+            title: 'Dynamic Form Validation',
+            code: `// Real-time form validation with smooth animations
+class FormValidator {
+  constructor(form) {
+    this.form = form;
+    this.rules = new Map();
+    this.init();
+  }
+
+  addRule(field, validator, message) {
+    this.rules.set(field, { validator, message });
+    return this;
+  }
+
+  async validate(field) {
+    const rule = this.rules.get(field);
+    const input = this.form.querySelector('[name="' + field + '"]');
+    
+    if (!rule || !input) return true;
+    
+    const isValid = await rule.validator(input.value);
+    this.showFeedback(input, isValid, rule.message);
+    
+    return isValid;
+  }
+
+  showFeedback(input, isValid, message) {
+    const feedback = input.nextElementSibling;
+    
+    input.classList.toggle('valid', isValid);
+    input.classList.toggle('invalid', !isValid);
+    
+    if (feedback) {
+      feedback.textContent = isValid ? '✓ Looks good!' : message;
+      feedback.className = isValid ? 'feedback success' : 'feedback error';
+    }
+  }
+}`,
+            demo: function() {
+                return `<div class="demo-form">
+                    <input type="email" placeholder="Enter your email" class="demo-input">
+                    <div class="feedback">Start typing to see validation...</div>
+                </div>`;
+            }
+        },
+        react: {
+            title: 'React Hook for API Calls',
+            code: `// Custom React hook for data fetching with loading states
+import { useState, useEffect } from 'react';
+
+export const useApi = (url, options = {}) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+          ...options,
+        });
+
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url]);
+
+  return { data, loading, error, refetch: fetchData };
+};`,
+            demo: function() {
+                return `<div class="react-demo">
+                    <div class="loading-state">🔄 Loading...</div>
+                    <div class="success-state">✅ Data loaded successfully!</div>
+                    <div class="error-state">❌ Error: Network timeout</div>
+                </div>`;
+            }
+        },
+        python: {
+            title: 'Automated Data Processing',
+            code: `# Automated data cleaning and analysis pipeline
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+
+class DataProcessor:
+    def __init__(self, data_source):
+        self.data_source = data_source
+        self.processed_data = None
+        
+    def clean_data(self, df):
+        """Remove duplicates and handle missing values"""
+        # Remove duplicates
+        df = df.drop_duplicates()
+        
+        # Handle missing values
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
+        
+        # Fill categorical missing values with mode
+        categorical_cols = df.select_dtypes(include=['object']).columns
+        for col in categorical_cols:
+            df[col] = df[col].fillna(df[col].mode()[0])
+            
+        return df
+    
+    def analyze_trends(self, df, date_column, metric_column):
+        """Analyze trends over time"""
+        df[date_column] = pd.to_datetime(df[date_column])
+        
+        # Calculate moving averages
+        df['7_day_avg'] = df[metric_column].rolling(window=7).mean()
+        df['30_day_avg'] = df[metric_column].rolling(window=30).mean()
+        
+        # Identify growth rate
+        df['growth_rate'] = df[metric_column].pct_change() * 100
+        
+        return df
+        
+    def generate_insights(self):
+        """Generate automated insights from the data"""
+        insights = {
+            'total_records': len(self.processed_data),
+            'date_range': f"{self.processed_data['date'].min()} to {self.processed_data['date'].max()}",
+            'avg_growth': self.processed_data['growth_rate'].mean(),
+            'peak_performance': self.processed_data['metric'].max()
+        }
+        
+        return insights`,
+            demo: function() {
+                return `<div class="python-demo">
+                    <div class="terminal">
+                        <div class="terminal-line">$ python data_processor.py</div>
+                        <div class="terminal-line">📊 Processing 10,247 records...</div>
+                        <div class="terminal-line">✨ Cleaned 847 duplicates</div>
+                        <div class="terminal-line">📈 Growth rate: +23.4%</div>
+                        <div class="terminal-line">✅ Analysis complete!</div>
+                    </div>
+                </div>`;
+            }
+        },
+        css: {
+            title: 'Advanced Animation System',
+            code: `/* Smooth micro-interactions and state transitions */
+.interactive-button {
+  position: relative;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 0.75rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.interactive-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.interactive-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 10px 25px rgba(99, 102, 241, 0.4),
+    0 20px 40px rgba(99, 102, 241, 0.1);
+}
+
+.interactive-button:hover::before {
+  left: 100%;
+}
+
+.interactive-button:active {
+  transform: translateY(-2px);
+  transition: transform 0.1s ease;
+}
+
+/* Loading state animation */
+.interactive-button.loading {
+  pointer-events: none;
+  background: #6b7280;
+}
+
+.interactive-button.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success state */
+.interactive-button.success {
+  background: #10b981;
+  animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}`,
+            demo: function() {
+                return `<div class="css-demo">
+                    <button class="demo-button interactive-button">Hover me!</button>
+                    <div class="demo-states">
+                        <button class="demo-button interactive-button loading">Loading...</button>
+                        <button class="demo-button interactive-button success">Success!</button>
+                    </div>
+                </div>`;
+            }
+        }
+    };
+
+    // Code tab switching
+    const codeTabs = document.querySelectorAll('.code-tab');
+    const codeDisplay = document.getElementById('code-display');
+    const codeTitle = document.getElementById('code-title');
+    const outputContent = document.getElementById('output-content');
+
+    codeTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const language = this.dataset.language;
+            const sample = codeSamples[language];
+
+            if (!sample) return;
+
+            // Update active tab
+            codeTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Update code display
+            codeDisplay.textContent = sample.code;
+            codeDisplay.className = 'language-' + language;
+            codeTitle.textContent = sample.title;
+
+            // Update output
+            outputContent.innerHTML = sample.demo();
+
+            // Add typing animation
+            animateCodeTyping(codeDisplay, sample.code);
+
+            // Initialize language-specific demos
+            if (language === 'javascript') {
+                initJavaScriptDemo();
+            } else if (language === 'css') {
+                initCSSDemo();
+            }
+        });
+    });
+
+    // Copy code functionality
+    const copyButton = document.getElementById('copy-code');
+    copyButton.addEventListener('click', function() {
+        const code = codeDisplay.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            this.textContent = '✅';
+            setTimeout(() => {
+                this.textContent = '📋';
+            }, 2000);
+        });
+    });
+
+    // Run code functionality (simulated)
+    const runButton = document.getElementById('run-code');
+    runButton.addEventListener('click', function() {
+        this.textContent = '⏳';
+        
+        setTimeout(() => {
+            this.textContent = '✅';
+            
+            // Add a flash animation to the output
+            outputContent.style.animation = 'flash 0.5s ease';
+            
+            setTimeout(() => {
+                this.textContent = '▶️';
+                outputContent.style.animation = '';
+            }, 1000);
+        }, 1500);
+    });
+
+    // Initialize JavaScript demo
+    function initJavaScriptDemo() {
+        const demoInput = outputContent.querySelector('.demo-input');
+        const feedback = outputContent.querySelector('.feedback');
+
+        if (!demoInput) return;
+
+        demoInput.addEventListener('input', function() {
+            const value = this.value;
+            const isValid = validateEmail(value);
+
+            this.classList.remove('valid', 'invalid');
+            
+            if (value.length > 0) {
+                if (isValid) {
+                    this.classList.add('valid');
+                    feedback.textContent = '✓ Looks good!';
+                    feedback.className = 'feedback success';
+                } else {
+                    this.classList.add('invalid');
+                    feedback.textContent = '❌ Please enter a valid email';
+                    feedback.className = 'feedback error';
+                }
+            } else {
+                feedback.textContent = 'Start typing to see validation...';
+                feedback.className = 'feedback';
+            }
+        });
+    }
+
+    // Initialize CSS demo
+    function initCSSDemo() {
+        const buttons = outputContent.querySelectorAll('.demo-button');
+        
+        buttons.forEach(button => {
+            if (button.classList.contains('interactive-button') && 
+                !button.classList.contains('loading') && 
+                !button.classList.contains('success')) {
+                
+                button.addEventListener('click', function() {
+                    this.classList.add('loading');
+                    this.textContent = 'Loading...';
+                    
+                    setTimeout(() => {
+                        this.classList.remove('loading');
+                        this.classList.add('success');
+                        this.textContent = 'Success!';
+                        
+                        setTimeout(() => {
+                            this.classList.remove('success');
+                            this.textContent = 'Hover me!';
+                        }, 2000);
+                    }, 2000);
+                });
+            }
+        });
+    }
+
+    // Email validation helper
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Typing animation for code
+    function animateCodeTyping(element, text) {
+        element.textContent = '';
+        let i = 0;
+        const speed = 20; // milliseconds per character
+
+        function typeWriter() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+
+        typeWriter();
+    }
+
+    // Animate tech stack bars on scroll
+    const techItems = document.querySelectorAll('.tech-item');
+    const techObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const levelBar = entry.target.querySelector('.level-bar');
+                if (levelBar && !levelBar.classList.contains('animated')) {
+                    levelBar.classList.add('animated');
+                    levelBar.style.width = levelBar.style.width; // Trigger animation
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    techItems.forEach(item => {
+        techObserver.observe(item);
+    });
+
+    // Add flash animation CSS
+    if (!document.getElementById('dynamic-styles')) {
+        const style = document.createElement('style');
+        style.id = 'dynamic-styles';
+        style.textContent = '@keyframes flash { 0%, 100% { background: var(--bg-tertiary); } 50% { background: rgba(99, 102, 241, 0.1); } }';
+        document.head.appendChild(style);
+    }
+});
+
 // Splash Screen and Page Load Animation Handler
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -230,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const rate = scrolled * -0.5;
             
             if (scrolled < window.innerHeight) {
-                gradientMesh.style.transform = `translateY(calc(-50% + ${rate}px))`;
+                gradientMesh.style.transform = 'translateY(calc(-50% + ' + rate + 'px))';
             }
         });
     }
@@ -535,12 +968,12 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceTypeInput.value = serviceKey;
 
         // Build details HTML
-        modalDetails.innerHTML = service.details.map(detail => `
-            <div class="service-detail">
-                <h4>${detail.title}</h4>
-                <p>${detail.content}</p>
-            </div>
-        `).join('');
+        modalDetails.innerHTML = service.details.map(function(detail) {
+            return '<div class="service-detail">' +
+                   '<h4>' + detail.title + '</h4>' +
+                   '<p>' + detail.content + '</p>' +
+                   '</div>';
+        }).join('');
 
         // Show modal with animation
         modal.style.display = 'flex';
