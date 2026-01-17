@@ -1044,9 +1044,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Form submission (placeholder for Formspree integration)
+    // Form submission with AJAX
     const contactForm = document.getElementById('service-contact-form');
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const submitButton = this.querySelector('.form-submit');
@@ -1058,24 +1058,81 @@ document.addEventListener('DOMContentLoaded', function() {
         submitText.style.display = 'none';
         submitLoading.style.display = 'inline';
         
-        // Simulate form submission (replace with actual Formspree integration)
-        setTimeout(() => {
-            alert('Thank you for your interest! I\'ll get back to you within 24 hours.\n\nNote: This is a demo form. Formspree integration will be added when you get your API key.');
+        // Collect form data
+        const formData = new FormData(this);
+        
+        // Convert FormData to JSON object
+        const formObject = {};
+        for (let [key, value] of formData.entries()) {
+            formObject[key] = value;
+        }
+        
+        // Add timestamp and additional info
+        formObject._timestamp = new Date().toISOString();
+        formObject._page = window.location.href;
+        formObject._userAgent = navigator.userAgent;
+        formObject._formType = 'service_inquiry';
+        
+        try {
+            // AJAX submission to your backend endpoint
+            // Replace '/submit-service-inquiry' with your actual endpoint
+            const response = await fetch('/submit-service-inquiry', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formObject)
+            });
             
-            // Reset form
-            this.reset();
-            closeModal();
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Success - close modal and show notification
+                this.reset();
+                closeModal();
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitText.style.display = 'inline';
+                submitLoading.style.display = 'none';
+                
+                // Show success notification
+                showNotification('Service inquiry sent! I\'ll get back to you within 24 hours.', 'success');
+            } else {
+                throw new Error(`Service inquiry failed: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Service form submission error:', error);
             
-            // Reset button state
-            submitButton.disabled = false;
-            submitText.style.display = 'inline';
-            submitLoading.style.display = 'none';
-        }, 2000);
+            // For demo purposes, show success if it's a network error (no backend yet)
+            if (error.message.includes('Failed to fetch') || error.message.includes('submit-service-inquiry')) {
+                // Simulate successful submission for demo
+                console.log('Service Inquiry Data (for demo):', formObject);
+                
+                this.reset();
+                closeModal();
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitText.style.display = 'inline';
+                submitLoading.style.display = 'none';
+                
+                showNotification('Demo mode: Service inquiry logged to console. Set up your backend!', 'info');
+            } else {
+                // Reset button state for real errors
+                submitButton.disabled = false;
+                submitText.style.display = 'inline';
+                submitLoading.style.display = 'none';
+                
+                showNotification('Failed to send inquiry. Please try contacting me directly.', 'error');
+            }
+        }
         
         // Track form submission
         // analytics.track('service_form_submitted', { 
-        //     service: serviceTypeInput.value,
-        //     email: this.email.value 
+        //     service: formObject.serviceType || 'unknown',
+        //     email: formObject.email 
         // });
     });
 });
@@ -1224,23 +1281,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Collect form data
         const formData = new FormData(contactForm);
         
+        // Convert FormData to JSON object for easier handling
+        const formObject = {};
+        for (let [key, value] of formData.entries()) {
+            formObject[key] = value;
+        }
+        
         // Add timestamp and page info
-        formData.append('_timestamp', new Date().toISOString());
-        formData.append('_page', window.location.href);
-        formData.append('_userAgent', navigator.userAgent);
+        formObject._timestamp = new Date().toISOString();
+        formObject._page = window.location.href;
+        formObject._userAgent = navigator.userAgent;
         
         try {
-            // TODO: Replace 'YOUR_FORMSPREE_ID' with actual Formspree form ID
-            // Example: https://formspree.io/f/xpznknko
-            const response = await fetch('https://formspree.io/f/YOUR_FORMSPREE_ID', {
+            // AJAX submission to your backend endpoint
+            // Replace '/submit-contact' with your actual endpoint
+            const response = await fetch('/submit-contact', {
                 method: 'POST',
-                body: formData,
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
-                }
+                },
+                body: JSON.stringify(formObject)
             });
             
             if (response.ok) {
+                const result = await response.json();
+                
                 // Success state
                 submitBtn.classList.remove('loading');
                 submitBtn.classList.add('success');
@@ -1261,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
                 }, 2000);
             } else {
-                throw new Error('Form submission failed');
+                throw new Error(`Form submission failed: ${response.status}`);
             }
         } catch (error) {
             console.error('Form submission error:', error);
@@ -1270,8 +1336,29 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = false;
             submitBtn.classList.remove('loading');
             
-            // Show error notification
-            showNotification('Failed to send message. Please try the direct contact methods above.', 'error');
+            // For demo purposes, show success if it's a network error (no backend yet)
+            if (error.message.includes('Failed to fetch') || error.message.includes('submit-contact')) {
+                // Simulate successful submission for demo
+                submitBtn.classList.add('success');
+                
+                // Log form data to console for now
+                console.log('Form Data (for demo):', formObject);
+                
+                setTimeout(() => {
+                    contactForm.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('success');
+                    contactForm.querySelectorAll('.valid, .invalid').forEach(field => {
+                        field.classList.remove('valid', 'invalid');
+                    });
+                    
+                    closeContactModal();
+                    showNotification('Demo mode: Form data logged to console. Set up your backend endpoint!', 'info');
+                }, 2000);
+            } else {
+                // Show error for other types of errors
+                showNotification('Failed to send message. Please try the direct contact methods above.', 'error');
+            }
         }
     });
     
