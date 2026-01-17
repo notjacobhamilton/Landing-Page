@@ -11,13 +11,24 @@ let emailConfig = {
 
 // Make config immediately available
 window.emailConfig = emailConfig;
+console.log('✅ Initial emailConfig set:', window.emailConfig);
 
 // Try to load secure configuration from Netlify Functions (override fallback)
 async function loadConfig() {
+    console.log('🔄 Attempting to load config from Netlify function...');
     try {
         const response = await fetch('/.netlify/functions/config');
+        console.log('📡 Function response status:', response.status);
+        
         if (response.ok) {
             const config = await response.json();
+            console.log('📥 Received config from function:', {
+                hasServiceId: !!config.serviceId,
+                hasContactTemplate: !!config.contactTemplateId,
+                hasServiceTemplate: !!config.serviceTemplateId,
+                hasPublicKey: !!config.publicKey
+            });
+            
             // Only update if all values are present
             if (config.serviceId && config.contactTemplateId && config.serviceTemplateId && config.publicKey) {
                 emailConfig = config;
@@ -27,11 +38,14 @@ async function loadConfig() {
                 console.log('⚠️ Using fallback configuration (some env vars missing)');
             }
         } else {
-            console.log('⚠️ Using fallback configuration (function not available)');
+            console.log('⚠️ Using fallback configuration (function not available, status:', response.status + ')');
         }
     } catch (error) {
         console.log('⚠️ Using fallback configuration (error loading from function):', error.message);
     }
+    
+    // Final check
+    console.log('🏁 Final emailConfig:', window.emailConfig);
     
     // Dispatch event to notify that config is ready (even if using fallback)
     window.dispatchEvent(new CustomEvent('configReady'));

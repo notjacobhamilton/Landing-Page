@@ -1090,6 +1090,18 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject.form_type = 'Service Inquiry';
         
         try {
+            // Debug: Check config before using it
+            console.log('About to send email. Config check:', {
+                configExists: !!window.emailConfig,
+                serviceId: window.emailConfig ? window.emailConfig.serviceId : 'undefined',
+                templateId: window.emailConfig ? window.emailConfig.serviceTemplateId : 'undefined'
+            });
+            
+            // Double-check config is available
+            if (!window.emailConfig || !window.emailConfig.serviceId) {
+                throw new Error('EmailJS configuration not loaded');
+            }
+            
             // EmailJS submission - uses secure configuration
             const response = await emailjs.send(
                 window.emailConfig.serviceId,
@@ -1650,6 +1662,18 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject.form_type = 'Contact Form';
         
         try {
+            // Debug: Check config before using it
+            console.log('About to send contact email. Config check:', {
+                configExists: !!window.emailConfig,
+                serviceId: window.emailConfig ? window.emailConfig.serviceId : 'undefined',
+                templateId: window.emailConfig ? window.emailConfig.contactTemplateId : 'undefined'
+            });
+            
+            // Double-check config is available
+            if (!window.emailConfig || !window.emailConfig.serviceId) {
+                throw new Error('EmailJS configuration not loaded');
+            }
+            
             // EmailJS submission - uses secure configuration
             const response = await emailjs.send(
                 window.emailConfig.serviceId,
