@@ -1049,6 +1049,24 @@ document.addEventListener('DOMContentLoaded', function() {
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Wait for config to be ready if not already loaded
+        if (!window.emailConfig) {
+            await new Promise(resolve => {
+                if (window.emailConfig) {
+                    resolve();
+                } else {
+                    window.addEventListener('configReady', resolve, { once: true });
+                }
+            });
+        }
+        
+        // Check if config is still null after loading
+        if (!window.emailConfig) {
+            console.error('EmailJS configuration not available for service form');
+            showNotification('Configuration error. Please contact me directly at jrhamilton0929@gmail.com', 'error');
+            return;
+        }
+        
         const submitButton = this.querySelector('.form-submit');
         const submitText = submitButton.querySelector('.submit-text');
         const submitLoading = submitButton.querySelector('.submit-loading');
@@ -1067,6 +1085,9 @@ document.addEventListener('DOMContentLoaded', function() {
             formObject[key] = value;
         }
         
+        // Debug log to see all form fields being sent (remove in production)
+        // console.log('Service form data being sent:', formObject);
+        
         // Add timestamp and additional info
         formObject.timestamp = new Date().toISOString();
         formObject.page_url = window.location.href;
@@ -1074,12 +1095,12 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject.form_type = 'Service Inquiry';
         
         try {
-            // EmailJS submission - replace with your EmailJS credentials
+            // EmailJS submission - uses secure configuration
             const response = await emailjs.send(
-                'service_03owqxk',     // Your EmailJS Service ID
-                'template_m1kk0n5',    // Service inquiry template
-                formObject,            // Form data
-                'u5U7kzPn5p1OUsf8s'    // Your EmailJS Public Key
+                window.emailConfig.serviceId,
+                window.emailConfig.serviceTemplateId,
+                formObject,
+                window.emailConfig.publicKey
             );
             
             // EmailJS success handling
@@ -1094,8 +1115,9 @@ document.addEventListener('DOMContentLoaded', function() {
             submitText.style.display = 'inline';
             submitLoading.style.display = 'none';
             
-                // Show enhanced success notification
-                showNotification('Service inquiry sent successfully! I\'ll get back to you within 24 hours.', 'success', 6000);        } catch (error) {
+            // Show enhanced success notification
+            showNotification('Service inquiry sent successfully! I\'ll get back to you within 24 hours.', 'success', 6000);
+        } catch (error) {
             console.error('Service form submission error:', error);
             
             // For demo purposes, show success if it's a network error (no backend yet)
@@ -1153,6 +1175,345 @@ function closeContactModal() {
     setTimeout(() => {
         contactModal.style.display = 'none';
     }, 300);
+}
+
+// Enhanced notification system with animations and timeframes (Global)
+function showNotification(message, type = 'info', duration = 6000) {
+    // Remove existing notifications with smooth animation
+    document.querySelectorAll('.notification').forEach(n => {
+        n.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => n.remove(), 300);
+    });
+    
+    const timestamp = new Date().toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+    });
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    // Add inline styles to ensure visibility
+    notification.style.cssText = `
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        z-index: 999999 !important;
+        min-width: 380px !important;
+        max-width: 450px !important;
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards !important;
+        overflow: hidden !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        color: #1a1a1a !important;
+    `;
+    
+    // Enhanced notification HTML with timeframe
+    notification.innerHTML = `
+        <div class="notification-content" style="padding: 20px; position: relative;">
+            <div class="notification-header" style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
+                <span class="notification-icon" style="font-size: 24px; flex-shrink: 0;">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'info' ? '💡' : '📧'}
+                </span>
+                <div class="notification-text" style="flex: 1; min-width: 0;">
+                    <div class="notification-title" style="font-weight: 600; font-size: 15px; color: #1a1a1a; margin-bottom: 4px; line-height: 1.4;">
+                        ${type === 'success' ? 'Email Sent Successfully!' : 
+                          type === 'error' ? 'Email Failed' : 
+                          type === 'info' ? 'Information' : 'Notification'}
+                    </div>
+                    <div class="notification-message" style="color: #64748b; font-size: 14px; line-height: 1.5;">${message}</div>
+                </div>
+                <span class="notification-timestamp" style="font-size: 12px; color: #9ca3af; background: #f8f9fa; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; font-weight: 500;">
+                    ${timestamp}
+                </span>
+            </div>
+            ${type === 'success' ? `
+            <div class="notification-timeframe" style="background: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 12px; margin-top: 12px;">
+                <div class="timeframe-item" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: #64748b;">
+                    <span class="timeframe-icon" style="font-size: 14px;">⚡</span>
+                    <span>Email delivered instantly</span>
+                </div>
+                <div class="timeframe-item" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
+                    <span class="timeframe-icon" style="font-size: 14px;">📬</span>
+                    <span>I'll respond within 24 hours</span>
+                </div>
+            </div>` : ''}
+            <div class="notification-progress" style="position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 0 0 16px 16px; width: 100%; animation: progressBar ${duration}ms linear forwards;"></div>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    `;
+    
+    // Add enhanced notification styles (only add once)
+    if (!document.querySelector('#notification-styles')) {
+        console.log('🎨 Adding notification styles to document');
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+                    .notification {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 999999 !important;
+                        min-width: 380px;
+                        max-width: 450px;
+                        background: var(--bg-primary);
+                        border: 1px solid var(--border-color);
+                        border-radius: 1rem;
+                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+                        backdrop-filter: blur(10px);
+                        animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+                        overflow: hidden;
+                        position: relative;
+                    }            .notification-success {
+                border-left: 4px solid #10b981;
+                background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(16, 185, 129, 0.05) 100%);
+            }
+            
+            .notification-error {
+                border-left: 4px solid #ef4444;
+                background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(239, 68, 68, 0.05) 100%);
+            }
+            
+            .notification-info {
+                border-left: 4px solid #6366f1;
+                background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(99, 102, 241, 0.05) 100%);
+            }
+            
+            .notification-content {
+                padding: 1.25rem;
+                position: relative;
+            }
+            
+            .notification-header {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.875rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .notification-icon {
+                font-size: 1.5rem;
+                flex-shrink: 0;
+                animation: bounce 0.6s ease 0.3s both;
+            }
+            
+            .notification-text {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .notification-title {
+                font-weight: 600;
+                font-size: 0.95rem;
+                color: var(--text-primary);
+                margin-bottom: 0.25rem;
+                line-height: 1.4;
+            }
+            
+            .notification-message {
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                line-height: 1.5;
+                opacity: 0;
+                animation: fadeInUp 0.4s ease 0.2s both;
+            }
+            
+            .notification-timestamp {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                background: var(--bg-secondary);
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.375rem;
+                flex-shrink: 0;
+                font-weight: 500;
+            }
+            
+            .notification-timeframe {
+                background: rgba(16, 185, 129, 0.1);
+                border-radius: 0.5rem;
+                padding: 0.75rem;
+                margin-top: 0.75rem;
+                opacity: 0;
+                animation: slideUp 0.5s ease 0.4s both;
+            }
+            
+            .timeframe-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+            }
+            
+            .timeframe-item:last-child {
+                margin-bottom: 0;
+            }
+            
+            .timeframe-icon {
+                font-size: 0.9rem;
+            }
+            
+            .notification-progress {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #10b981, #34d399);
+                border-radius: 0 0 1rem 1rem;
+                animation: progressBar ${duration}ms linear forwards;
+            }
+            
+            .notification-close {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 0.375rem;
+                border-radius: 0.375rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                opacity: 0;
+                animation: fadeIn 0.3s ease 0.5s both;
+            }
+            
+            .notification-close:hover {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                transform: scale(1.1);
+            }
+            
+            .notification-close svg {
+                width: 14px;
+                height: 14px;
+            }
+            
+            /* Enhanced Animations */
+            @keyframes slideInBounce {
+                0% {
+                    transform: translateX(100%) translateY(-20px);
+                    opacity: 0;
+                }
+                60% {
+                    transform: translateX(-10px) translateY(0);
+                    opacity: 1;
+                }
+                80% {
+                    transform: translateX(5px) translateY(0);
+                }
+                100% {
+                    transform: translateX(0) translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                0% {
+                    transform: translateX(0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%) scale(0.8);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-8px);
+                }
+                60% {
+                    transform: translateY(-4px);
+                }
+            }
+            
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes progressBar {
+                from {
+                    width: 100%;
+                }
+                to {
+                    width: 0%;
+                }
+            }
+            
+            /* Mobile Responsive */
+            @media (max-width: 480px) {
+                .notification {
+                    right: 10px;
+                    left: 10px;
+                    min-width: auto;
+                    max-width: none;
+                }
+            }
+            
+            /* Dark mode adjustments */
+            [data-theme="dark"] .notification {
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+        `;
+        document.head.appendChild(styles);
+        console.log('✅ Notification styles successfully added to document head');
+    } else {
+        console.log('ℹ️ Notification styles already exist');
+    }
+    
+    document.body.appendChild(notification);
+    console.log(`🎯 Notification added to DOM. Element classes: ${notification.className}`);
+    console.log('📍 Notification element style:', notification.style.cssText);
+    
+    // Auto-remove after specified duration
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, duration);
+    
+    return notification;
 }
 
 // Contact Modal Functionality
@@ -1250,6 +1611,24 @@ document.addEventListener('DOMContentLoaded', function() {
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Wait for config to be ready if not already loaded
+        if (!window.emailConfig) {
+            await new Promise(resolve => {
+                if (window.emailConfig) {
+                    resolve();
+                } else {
+                    window.addEventListener('configReady', resolve, { once: true });
+                }
+            });
+        }
+        
+        // Check if config is still null after loading
+        if (!window.emailConfig) {
+            console.error('EmailJS configuration not available for contact form');
+            showNotification('Configuration error. Please contact me directly at jrhamilton0929@gmail.com', 'error');
+            return;
+        }
+        
         // Validate all fields
         let isValid = true;
         contactForm.querySelectorAll('input, select, textarea').forEach(field => {
@@ -1287,12 +1666,12 @@ document.addEventListener('DOMContentLoaded', function() {
         formObject.form_type = 'Contact Form';
         
         try {
-            // EmailJS submission - replace with your EmailJS credentials
+            // EmailJS submission - uses secure configuration
             const response = await emailjs.send(
-                'service_03owqxk',     // Your EmailJS Service ID
-                'template_8gxax7w',    // Main contact form template
-                formObject,            // Form data
-                'u5U7kzPn5p1OUsf8s'    // Your EmailJS Public Key
+                window.emailConfig.serviceId,
+                window.emailConfig.contactTemplateId,
+                formObject,
+                window.emailConfig.publicKey
             );
             
             // EmailJS returns a different response format
@@ -1350,319 +1729,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
-    // Enhanced notification system with animations and timeframes
-    function showNotification(message, type = 'info', duration = 6000) {
-        // Remove existing notifications with smooth animation
-        document.querySelectorAll('.notification').forEach(n => {
-            n.style.animation = 'slideOut 0.3s ease forwards';
-            setTimeout(() => n.remove(), 300);
-        });
-        
-        const timestamp = new Date().toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-        });
-        
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        
-        // Enhanced notification HTML with timeframe
-        notification.innerHTML = `
-            <div class="notification-content">
-                <div class="notification-header">
-                    <span class="notification-icon">
-                        ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'info' ? '💡' : '📧'}
-                    </span>
-                    <div class="notification-text">
-                        <div class="notification-title">
-                            ${type === 'success' ? 'Email Sent Successfully!' : 
-                              type === 'error' ? 'Email Failed' : 
-                              type === 'info' ? 'Information' : 'Notification'}
-                        </div>
-                        <div class="notification-message">${message}</div>
-                    </div>
-                    <span class="notification-timestamp">${timestamp}</span>
-                </div>
-                ${type === 'success' ? `
-                <div class="notification-timeframe">
-                    <div class="timeframe-item">
-                        <span class="timeframe-icon">⚡</span>
-                        <span>Email delivered instantly</span>
-                    </div>
-                    <div class="timeframe-item">  
-                        <span class="timeframe-icon">📬</span>
-                        <span>I'll respond within 24 hours</span>
-                    </div>
-                </div>` : ''}
-                <div class="notification-progress"></div>
-                <button class="notification-close" onclick="this.parentElement.remove()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-        `;
-        
-        // Add enhanced notification styles
-        if (!document.querySelector('#notification-styles')) {
-            const styles = document.createElement('style');
-            styles.id = 'notification-styles';
-            styles.textContent = `
-                .notification {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 10000;
-                    min-width: 380px;
-                    max-width: 450px;
-                    background: var(--bg-primary);
-                    border: 1px solid var(--border-color);
-                    border-radius: 1rem;
-                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-                    backdrop-filter: blur(10px);
-                    animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-                    overflow: hidden;
-                    position: relative;
-                }
-                
-                .notification-success {
-                    border-left: 4px solid #10b981;
-                    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(16, 185, 129, 0.05) 100%);
-                }
-                
-                .notification-error {
-                    border-left: 4px solid #ef4444;
-                    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(239, 68, 68, 0.05) 100%);
-                }
-                
-                .notification-info {
-                    border-left: 4px solid #6366f1;
-                    background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(99, 102, 241, 0.05) 100%);
-                }
-                
-                .notification-content {
-                    padding: 1.25rem;
-                    position: relative;
-                }
-                
-                .notification-header {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 0.875rem;
-                    margin-bottom: 0.75rem;
-                }
-                
-                .notification-icon {
-                    font-size: 1.5rem;
-                    flex-shrink: 0;
-                    animation: bounce 0.6s ease 0.3s both;
-                }
-                
-                .notification-text {
-                    flex: 1;
-                    min-width: 0;
-                }
-                
-                .notification-title {
-                    font-weight: 600;
-                    font-size: 0.95rem;
-                    color: var(--text-primary);
-                    margin-bottom: 0.25rem;
-                    line-height: 1.4;
-                }
-                
-                .notification-message {
-                    color: var(--text-secondary);
-                    font-size: 0.85rem;
-                    line-height: 1.5;
-                    opacity: 0;
-                    animation: fadeInUp 0.4s ease 0.2s both;
-                }
-                
-                .notification-timestamp {
-                    font-size: 0.75rem;
-                    color: var(--text-muted);
-                    background: var(--bg-secondary);
-                    padding: 0.25rem 0.5rem;
-                    border-radius: 0.375rem;
-                    flex-shrink: 0;
-                    font-weight: 500;
-                }
-                
-                .notification-timeframe {
-                    background: rgba(16, 185, 129, 0.1);
-                    border-radius: 0.5rem;
-                    padding: 0.75rem;
-                    margin-top: 0.75rem;
-                    opacity: 0;
-                    animation: slideUp 0.5s ease 0.4s both;
-                }
-                
-                .timeframe-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    margin-bottom: 0.5rem;
-                    font-size: 0.8rem;
-                    color: var(--text-secondary);
-                }
-                
-                .timeframe-item:last-child {
-                    margin-bottom: 0;
-                }
-                
-                .timeframe-icon {
-                    font-size: 0.9rem;
-                }
-                
-                .notification-progress {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    height: 3px;
-                    background: linear-gradient(90deg, #10b981, #34d399);
-                    border-radius: 0 0 1rem 1rem;
-                    animation: progressBar ${duration}ms linear forwards;
-                }
-                
-                .notification-close {
-                    position: absolute;
-                    top: 0.75rem;
-                    right: 0.75rem;
-                    background: none;
-                    border: none;
-                    color: var(--text-muted);
-                    cursor: pointer;
-                    padding: 0.375rem;
-                    border-radius: 0.375rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                    opacity: 0;
-                    animation: fadeIn 0.3s ease 0.5s both;
-                }
-                
-                .notification-close:hover {
-                    background: var(--bg-secondary);
-                    color: var(--text-primary);
-                    transform: scale(1.1);
-                }
-                
-                .notification-close svg {
-                    width: 14px;
-                    height: 14px;
-                }
-                
-                /* Enhanced Animations */
-                @keyframes slideInBounce {
-                    0% {
-                        transform: translateX(100%) translateY(-20px);
-                        opacity: 0;
-                    }
-                    60% {
-                        transform: translateX(-10px) translateY(0);
-                        opacity: 1;
-                    }
-                    80% {
-                        transform: translateX(5px) translateY(0);
-                    }
-                    100% {
-                        transform: translateX(0) translateY(0);
-                        opacity: 1;
-                    }
-                }
-                
-                @keyframes slideOut {
-                    0% {
-                        transform: translateX(0) scale(1);
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateX(100%) scale(0.8);
-                        opacity: 0;
-                    }
-                }
-                
-                @keyframes bounce {
-                    0%, 20%, 50%, 80%, 100% {
-                        transform: translateY(0);
-                    }
-                    40% {
-                        transform: translateY(-8px);
-                    }
-                    60% {
-                        transform: translateY(-4px);
-                    }
-                }
-                
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                @keyframes slideUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                
-                @keyframes progressBar {
-                    from {
-                        width: 100%;
-                    }
-                    to {
-                        width: 0%;
-                    }
-                }
-                
-                /* Mobile Responsive */
-                @media (max-width: 480px) {
-                    .notification {
-                        right: 10px;
-                        left: 10px;
-                        min-width: auto;
-                        max-width: none;
-                    }
-                }
-                
-                /* Dark mode adjustments */
-                [data-theme="dark"] .notification {
-                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2);
-                }
-            `;
-            document.head.appendChild(styles);
-        }
-        
-        document.body.appendChild(notification);
-        
-        // Auto-remove after specified duration
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'slideOut 0.3s ease forwards';
-                setTimeout(() => notification.remove(), 300);
-            }
-        }, duration);
-        
-        return notification;
-    }
 });

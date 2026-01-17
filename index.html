@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jacob Hamilton - Freelance Web Developer</title>
     <meta name="description" content="Modern websites built to help small businesses grow. Custom web development, landing pages, and business applications by Jacob Hamilton.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -762,6 +763,17 @@ class FormValidator {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="config.js"></script>
+    <!-- For local development, create config.local.js with your EmailJS credentials -->
+    <script>
+        // Try to load local config for development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const script = document.createElement('script');
+            script.src = 'config.local.js';
+            script.onerror = () => console.log('No local config found - using environment variables only');
+            document.head.appendChild(script);
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

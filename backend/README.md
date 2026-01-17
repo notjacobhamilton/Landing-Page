@@ -1,17 +1,26 @@
-# Backend Setup Guide
+# Backend Directory - LEGACY
 
-This folder contains PHP scripts to handle form submissions and send emails to jrhamilton0929@gmail.com.
+⚠️ **These PHP scripts are no longer used in the current implementation.**
 
-## Files:
-- `submit-contact.php` - Handles main contact form submissions
-- `submit-service-inquiry.php` - Handles service inquiry form submissions
+## Current Implementation
 
-## Deployment Steps:
+The landing page now uses **EmailJS** for form submissions, which provides:
+- ✅ Serverless and works on static hosting (Netlify)
+- ✅ No backend server required
+- ✅ Secure email delivery
+- ✅ Real-time notifications
 
-### 1. Upload to Web Server
-Upload the entire `backend` folder to your web server where you have PHP enabled.
+## Legacy Files
 
-### 2. Update JavaScript URLs
+- `submit-contact.php` - Legacy contact form handler (replaced by EmailJS)
+- `submit-service-inquiry.php` - Legacy service form handler (replaced by EmailJS)
+
+These files are kept for reference but are **not used in production**.
+
+---
+
+## Original Documentation (For Reference)
+
 In your `script.js` file, update the fetch URLs:
 
 **For main contact form:**
