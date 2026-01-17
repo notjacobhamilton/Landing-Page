@@ -1068,42 +1068,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Add timestamp and additional info
-        formObject._timestamp = new Date().toISOString();
-        formObject._page = window.location.href;
-        formObject._userAgent = navigator.userAgent;
-        formObject._emailTo = 'jrhamilton0929@gmail.com';
-        formObject._subject = 'Website Inquiry - Service Request';
-        formObject._formType = 'service_inquiry';
+        formObject.timestamp = new Date().toISOString();
+        formObject.page_url = window.location.href;
+        formObject.user_agent = navigator.userAgent;
+        formObject.form_type = 'Service Inquiry';
         
         try {
-            // AJAX submission to your backend endpoint
-            // Replace '/submit-service-inquiry' with your actual endpoint
-            const response = await fetch('/submit-service-inquiry', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(formObject)
-            });
+            // EmailJS submission - replace with your EmailJS credentials
+            const response = await emailjs.send(
+                'YOUR_SERVICE_ID',     // Replace with your EmailJS Service ID
+                'YOUR_TEMPLATE_ID',    // Replace with your EmailJS Template ID  
+                formObject,            // Form data
+                'YOUR_PUBLIC_KEY'      // Replace with your EmailJS Public Key
+            );
             
-            if (response.ok) {
-                const result = await response.json();
-                
-                // Success - close modal and show notification
-                this.reset();
-                closeModal();
-                
-                // Reset button state
-                submitButton.disabled = false;
-                submitText.style.display = 'inline';
-                submitLoading.style.display = 'none';
-                
-                // Show success notification
-                showNotification('Service inquiry sent! I\'ll get back to you within 24 hours.', 'success');
-            } else {
-                throw new Error(`Service inquiry failed: ${response.status}`);
-            }
+            // EmailJS success handling
+            console.log('Service EmailJS response:', response);
+            
+            // Success - close modal and show notification
+            this.reset();
+            closeModal();
+            
+            // Reset button state
+            submitButton.disabled = false;
+            submitText.style.display = 'inline';
+            submitLoading.style.display = 'none';
+            
+            // Show success notification
+            showNotification('Service inquiry sent! I\'ll get back to you within 24 hours.', 'success');
+            
         } catch (error) {
             console.error('Service form submission error:', error);
             
@@ -1290,50 +1283,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Add timestamp and page info
-        formObject._timestamp = new Date().toISOString();
-        formObject._page = window.location.href;
-        formObject._userAgent = navigator.userAgent;
-        formObject._emailTo = 'jrhamilton0929@gmail.com';
-        formObject._subject = 'Website Inquiry - Contact Form Submission';
-        formObject._formType = 'contact';
+        formObject.timestamp = new Date().toISOString();
+        formObject.page_url = window.location.href;
+        formObject.user_agent = navigator.userAgent;
+        formObject.form_type = 'Contact Form';
         
         try {
-            // AJAX submission to your backend endpoint
-            // Replace '/submit-contact' with your actual endpoint
-            const response = await fetch('/submit-contact', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(formObject)
-            });
+            // EmailJS submission - replace with your EmailJS credentials
+            const response = await emailjs.send(
+                'YOUR_SERVICE_ID',     // Replace with your EmailJS Service ID
+                'YOUR_TEMPLATE_ID',    // Replace with your EmailJS Template ID
+                formObject,            // Form data
+                'YOUR_PUBLIC_KEY'      // Replace with your EmailJS Public Key
+            );
             
-            if (response.ok) {
-                const result = await response.json();
+            // EmailJS returns a different response format
+            console.log('EmailJS response:', response);
+            
+            // Success state
+            submitBtn.classList.remove('loading');
+            submitBtn.classList.add('success');
+            
+            // Reset form after delay
+            setTimeout(() => {
+                contactForm.reset();
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('success');
+                contactForm.querySelectorAll('.valid, .invalid').forEach(field => {
+                    field.classList.remove('valid', 'invalid');
+                });
                 
-                // Success state
-                submitBtn.classList.remove('loading');
-                submitBtn.classList.add('success');
+                // Close modal
+                closeContactModal();
                 
-                // Reset form after delay
-                setTimeout(() => {
-                    contactForm.reset();
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('success');
-                    contactForm.querySelectorAll('.valid, .invalid').forEach(field => {
-                        field.classList.remove('valid', 'invalid');
-                    });
-                    
-                    // Close modal
-                    closeContactModal();
-                    
-                    // Show success notification
-                    showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
-                }, 2000);
-            } else {
-                throw new Error(`Form submission failed: ${response.status}`);
-            }
+                // Show success notification
+                showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
+            }, 2000);
+            
         } catch (error) {
             console.error('Form submission error:', error);
             
